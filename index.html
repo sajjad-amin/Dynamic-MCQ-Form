@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Dynamic MCQ Form Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="jquery/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/qCard.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <br>
+        <h3>Create MCQ Exam</h3><br>
+        <div class="form-group">
+            <label for="examname">Exam Name</label>
+            <input type="text" class="form-control" id="examname" placeholder="Exam Name">
+        </div>
+        <div class="form-group">
+            <label for="examdescription">Exam Description</label>
+            <textarea class="form-control" id="examdescription" rows="4" placeholder="Exam Description"></textarea>
+        </div>
+        <div id="questionsDiv"></div>
+        <div style="float: right;margin: 20px;">
+            <button type="button" id="addnew" class="btn btn-primary">Add Question</button>
+            <button type="button" id="submit" class="btn btn-primary">Create Questions</button>
+        </div>
+    </div>
+
+    <script>
+        let questionDiv = document.getElementById('questionsDiv')
+        let questionNo = 0
+        document.getElementById('addnew').addEventListener('click', function(e){
+            questionNo += 1
+            let card = getQuestionCard().cloneNode(true)
+            let clsBtn = createHtmlElement('button',[
+                ['class', 'btn btn-danger btn-sm rmqs'],
+                ['style', 'float: right;margin: -5px 5px 5px 0px;']
+            ],'Remove Question')
+            clsBtn.addEventListener('click', function(e){
+                questionNo -= 1
+                this.parentElement.parentElement.remove()
+            })
+            card.querySelector('.card-header').innerHTML = `Question ${questionNo}`
+            card.querySelector('.card-header').appendChild(clsBtn)
+            questionDiv.appendChild(card)
+            window.scrollTo(0,document.body.scrollHeight)
+        })
+        document.getElementById('submit').addEventListener('click', function(e){
+            let data = []
+            let metaData = {
+                title: document.getElementById('examname').value,
+                description: document.getElementById('examdescription').value
+            }
+            let readyForSubmit = false
+            let cards = document.querySelectorAll('.qCard')
+            for (let i = 0; i < cards.length; i++) {
+                let question = cards[i].querySelector('.question').value
+                let answer = cards[i].querySelector('.answer').value
+                let option1 = cards[i].querySelector('.option1').value
+                let option2 = cards[i].querySelector('.option2').value
+                let option3 = cards[i].querySelector('.option3').value
+                let option4 = cards[i].querySelector('.option4').value
+                if (question && answer && option1 && option2 && option3 && option4 !== "") {
+                    data[i] = {
+                        question,
+                        answer,
+                        option1,
+                        option2,
+                        option3,
+                        option4
+                    }
+                    readyForSubmit = true
+                } else {
+                    readyForSubmit = false
+                }
+            }
+            let json = JSON.stringify([metaData,data])
+            if (readyForSubmit) {
+                console.log(json)
+            } else {
+                alert('Please fill out the fields')
+            }
+        });
+    </script>
+
+</body>
+
+</html>
